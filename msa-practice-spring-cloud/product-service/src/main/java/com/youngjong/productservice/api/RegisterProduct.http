@@ -1,0 +1,11 @@
+# 테스트용 http 내용
+
+POST localhost:8082/products
+Content-Type: application/json
+
+{
+  "name": "노트북",
+  "description": "16GB RAM, SSD 512GB",
+  "price": 1500000,
+  "stockQuantity": 10
+}
