@@ -1,5 +1,6 @@
 package com.youngjong.productservice.application.service;
 
+import com.youngjong.productservice.api.ProductDetailResponse;
 import com.youngjong.productservice.api.ProductSummaryResponse;
 import com.youngjong.productservice.application.command.RegisterProductCommand;
 import com.youngjong.productservice.domain.model.Product;
@@ -45,6 +46,21 @@ public class ProductService {
                         product.getCreatedAt()
                 ))
                 .toList();
+    }
+
+
+    public ProductDetailResponse getProductDetail(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
+
+        return new ProductDetailResponse(
+                product.getId(),
+                product.getName(),
+                product.getDescription(),
+                product.getPrice(),
+                product.getStockQuantity(),
+                product.getCreatedAt()
+        );
     }
 
 
