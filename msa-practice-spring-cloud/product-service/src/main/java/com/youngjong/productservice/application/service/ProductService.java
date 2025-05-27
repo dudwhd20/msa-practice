@@ -1,10 +1,13 @@
 package com.youngjong.productservice.application.service;
 
+import com.youngjong.productservice.api.ProductSummaryResponse;
 import com.youngjong.productservice.application.command.RegisterProductCommand;
 import com.youngjong.productservice.domain.model.Product;
 import com.youngjong.productservice.domain.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class ProductService {
@@ -29,5 +32,20 @@ public class ProductService {
         Product saved = productRepository.save(product);
         return saved.getId();
     }
+
+    public List<ProductSummaryResponse> getAllProducts() {
+        List<Product> products = productRepository.findAll();
+
+        return products.stream()
+                .map(product -> new ProductSummaryResponse(
+                        product.getId(),
+                        product.getName(),
+                        product.getPrice(),
+                        product.getStockQuantity(),
+                        product.getCreatedAt()
+                ))
+                .toList();
+    }
+
 
 }
