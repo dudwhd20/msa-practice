@@ -1,0 +1,8 @@
+# 테스트용 http 내용
+
+PATCH localhost:8082/products/1/stock
+Content-Type: application/json
+
+{
+  "quantity": 2
+}

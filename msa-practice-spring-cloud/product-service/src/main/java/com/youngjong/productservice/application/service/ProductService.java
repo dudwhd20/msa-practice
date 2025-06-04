@@ -63,5 +63,13 @@ public class ProductService {
         );
     }
 
+    @Transactional
+    public void decreaseStock(Long productId, int quantity) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
+
+        product.decreaseStock(quantity); // 도메인 메서드 호출
+    }
+
 
 }

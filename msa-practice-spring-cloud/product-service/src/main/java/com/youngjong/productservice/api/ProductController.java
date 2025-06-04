@@ -43,5 +43,14 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
+    @PatchMapping("/{id}/stock")
+    public ResponseEntity<Void> decreaseStock(
+            @PathVariable Long id,
+            @RequestBody DecreaseStockRequest request) {
+
+        productService.decreaseStock(id, request.getQuantity());
+        return ResponseEntity.ok().build();
+    }
+
 
 }
