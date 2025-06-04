@@ -2,6 +2,7 @@ package com.youngjong.productservice.application.service;
 
 import com.youngjong.productservice.api.ProductDetailResponse;
 import com.youngjong.productservice.api.ProductSummaryResponse;
+import com.youngjong.productservice.api.UpdateProductRequest;
 import com.youngjong.productservice.application.command.RegisterProductCommand;
 import com.youngjong.productservice.domain.model.Product;
 import com.youngjong.productservice.domain.repository.ProductRepository;
@@ -71,5 +72,16 @@ public class ProductService {
         product.decreaseStock(quantity); // 도메인 메서드 호출
     }
 
+    @Transactional
+    public void updateProduct(Long id, UpdateProductRequest request) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
 
+        product.update(
+                request.getName(),
+                request.getDescription(),
+                request.getPrice(),
+                request.getStockQuantity()
+        );
+    }
 }

@@ -48,6 +48,18 @@ public class Product {
         this.updatedAt = LocalDateTime.now();
     }
 
+    public void update(String name, String description, int price, int stockQuantity) {
+        if (price < 0 || stockQuantity < 0) {
+            throw new IllegalArgumentException("가격 또는 재고 수량은 0 이상이어야 합니다.");
+        }
+
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.stockQuantity = stockQuantity;
+        this.updatedAt = LocalDateTime.now();
+    }
+
 
     // getter
     public Long getId() {
