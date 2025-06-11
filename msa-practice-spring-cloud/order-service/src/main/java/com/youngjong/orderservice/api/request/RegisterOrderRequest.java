@@ -1,4 +1,4 @@
-package com.youngjong.orderservice.api;
+package com.youngjong.orderservice.api.request;
 
 public class RegisterOrderRequest {
     private Long userId;
