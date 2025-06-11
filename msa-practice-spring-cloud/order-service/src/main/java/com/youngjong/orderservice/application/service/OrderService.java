@@ -70,4 +70,30 @@ public class OrderService {
         );
     }
 
+    @Transactional(readOnly = true)
+    public List<OrderResponse> getOrdersByUserId(Long userId) {
+        List<Order> orders = orderRepository.findAllByUserId(userId);
+
+        return orders.stream()
+                .map(order -> {
+                    List<OrderItemResponse> itemResponses = order.getOrderItems().stream()
+                            .map(item -> new OrderItemResponse(
+                                    item.getProductId(),
+                                    item.getProductName(),
+                                    item.getQuantity(),
+                                    item.getPrice()
+                            ))
+                            .toList();
+
+                    return new OrderResponse(
+                            order.getId(),
+                            order.getUserId(),
+                            order.getStatus().name(),
+                            order.getCreatedAt(),
+                            itemResponses
+                    );
+                })
+                .toList();
+    }
+
 }
