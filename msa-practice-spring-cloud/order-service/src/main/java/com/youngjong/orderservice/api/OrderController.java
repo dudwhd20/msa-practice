@@ -1,19 +1,30 @@
 package com.youngjong.orderservice.api;
 
+import com.youngjong.orderservice.application.command.RegisterOrderCommand;
+import com.youngjong.orderservice.application.service.OrderService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/orders")
 public class OrderController {
 
-    @GetMapping("/{id}")
-    public String getOrder(@PathVariable String id) {
-        return "Order: " + id;
+    private final OrderService orderService;
+
+    public OrderController(OrderService orderService) {
+        this.orderService = orderService;
     }
 
     @PostMapping
-    public String createOrder() {
-        return "Order created!";
+    public ResponseEntity<Long> registerOrder(@RequestBody RegisterOrderRequest request) {
+        RegisterOrderCommand command = new RegisterOrderCommand(
+                request.getUserId(),
+                request.getProductId(),
+                request.getQuantity()
+        );
+
+        Long orderId = orderService.registerOrder(command);
+        return ResponseEntity.ok(orderId);
     }
 
  }
