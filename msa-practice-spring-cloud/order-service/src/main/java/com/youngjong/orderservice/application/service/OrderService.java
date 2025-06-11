@@ -1,5 +1,7 @@
 package com.youngjong.orderservice.application.service;
 
+import com.youngjong.orderservice.api.response.OrderItemResponse;
+import com.youngjong.orderservice.api.response.OrderResponse;
 import com.youngjong.orderservice.application.command.RegisterOrderCommand;
 import com.youngjong.orderservice.domain.model.Order;
 import com.youngjong.orderservice.domain.model.OrderItem;
@@ -9,6 +11,8 @@ import com.youngjong.orderservice.infrastructure.ProductClient;
 import com.youngjong.orderservice.infrastructure.ProductInfo;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class OrderService {
@@ -26,7 +30,7 @@ public class OrderService {
         ProductInfo product = productClient.getProduct(command.getProductId());
 
         // 2. 상품 서비스에 재고 차감 요청
-        productClient.decreaseStock(command.getProductId(),  new DecreaseStockRequest(command.getQuantity()));
+        productClient.decreaseStock(command.getProductId(), new DecreaseStockRequest(command.getQuantity()));
 
         // 3. 주문 도메인 생성
         Order order = new Order(command.getUserId());
@@ -41,6 +45,29 @@ public class OrderService {
         // 4. 저장 후 주문 ID 반환
         Order saved = orderRepository.save(order);
         return saved.getId();
+    }
+
+    @Transactional(readOnly = true)
+    public OrderResponse getOrder(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("주문을 찾을 수 없습니다."));
+
+        List<OrderItemResponse> itemResponses = order.getOrderItems().stream()
+                .map(item -> new OrderItemResponse(
+                        item.getProductId(),
+                        item.getProductName(),
+                        item.getQuantity(),
+                        item.getPrice()
+                ))
+                .toList();
+
+        return new OrderResponse(
+                order.getId(),
+                order.getUserId(),
+                order.getStatus().name(),
+                order.getCreatedAt(),
+                itemResponses
+        );
     }
 
 }

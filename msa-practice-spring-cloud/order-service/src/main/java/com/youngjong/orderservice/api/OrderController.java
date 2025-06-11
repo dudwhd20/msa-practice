@@ -1,5 +1,7 @@
 package com.youngjong.orderservice.api;
 
+import com.youngjong.orderservice.api.request.RegisterOrderRequest;
+import com.youngjong.orderservice.api.response.OrderResponse;
 import com.youngjong.orderservice.application.command.RegisterOrderCommand;
 import com.youngjong.orderservice.application.service.OrderService;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +27,11 @@ public class OrderController {
 
         Long orderId = orderService.registerOrder(command);
         return ResponseEntity.ok(orderId);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<OrderResponse> getOrder(@PathVariable Long id){
+        return ResponseEntity.ok(orderService.getOrder(id));
     }
 
  }
