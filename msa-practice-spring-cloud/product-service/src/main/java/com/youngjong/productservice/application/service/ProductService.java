@@ -92,4 +92,12 @@ public class ProductService {
 
         productRepository.delete(product);
     }
+
+    @Transactional
+    public void increaseStock(Long productId, int quantity) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
+
+        product.increaseStock(quantity);
+    }
 }

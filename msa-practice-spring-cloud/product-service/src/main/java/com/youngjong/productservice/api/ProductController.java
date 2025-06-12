@@ -68,4 +68,10 @@ public class ProductController {
     }
 
 
+    @PatchMapping("/products/{id}/stock/increase")
+    public ResponseEntity<Void> increaseStock(@PathVariable Long id, @RequestBody IncreaseStockRequest request) {
+        productService.increaseStock(id, request.getQuantity());
+        return ResponseEntity.ok().build();
+    }
+
 }

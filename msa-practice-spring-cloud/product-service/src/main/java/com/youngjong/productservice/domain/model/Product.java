@@ -23,7 +23,8 @@ public class Product {
     private LocalDateTime updatedAt;
 
 
-    protected Product() {} // JPA용 기본 생성자
+    protected Product() {
+    } // JPA용 기본 생성자
 
     public Product(String name, String description, int price, int stockQuantity) {
         this.name = name;
