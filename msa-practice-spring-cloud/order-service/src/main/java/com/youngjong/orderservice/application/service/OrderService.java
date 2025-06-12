@@ -1,5 +1,6 @@
 package com.youngjong.orderservice.application.service;
 
+import com.youngjong.orderservice.api.request.IncreaseStockRequest;
 import com.youngjong.orderservice.api.response.OrderItemResponse;
 import com.youngjong.orderservice.api.response.OrderResponse;
 import com.youngjong.orderservice.application.command.RegisterOrderCommand;
@@ -94,6 +95,23 @@ public class OrderService {
                     );
                 })
                 .toList();
+    }
+
+    @Transactional
+    public void cancelOrder(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("주문을 찾을 수 없습니다."));
+
+        // 주문 상태 변경
+        order.cancel();
+
+        // 주문 아이템별로 재고 복구 요청
+        order.getOrderItems().forEach(item -> {
+            productClient.increaseStock(
+                    item.getProductId(),
+                    new IncreaseStockRequest(item.getQuantity())
+            );
+        });
     }
 
 }
