@@ -4,6 +4,8 @@ import com.youngjong.orderservice.api.request.IncreaseStockRequest;
 import com.youngjong.orderservice.api.response.OrderItemResponse;
 import com.youngjong.orderservice.api.response.OrderResponse;
 import com.youngjong.orderservice.application.command.RegisterOrderCommand;
+import com.youngjong.orderservice.application.event.OrderCancelledEvent;
+import com.youngjong.orderservice.application.port.out.OrderEventPublisher;
 import com.youngjong.orderservice.domain.model.Order;
 import com.youngjong.orderservice.domain.model.OrderItem;
 import com.youngjong.orderservice.domain.repository.OrderRepository;
@@ -19,10 +21,12 @@ import java.util.List;
 public class OrderService {
     private final OrderRepository orderRepository;
     private final ProductClient productClient;
+    private final OrderEventPublisher orderEventPublisher;
 
-    public OrderService(OrderRepository orderRepository, ProductClient productClient) {
+    public OrderService(OrderRepository orderRepository, ProductClient productClient, OrderEventPublisher orderEventPublisher) {
         this.orderRepository = orderRepository;
         this.productClient = productClient;
+        this.orderEventPublisher = orderEventPublisher;
     }
 
     @Transactional
@@ -101,16 +105,15 @@ public class OrderService {
     public void cancelOrder(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("주문을 찾을 수 없습니다."));
-
-        // 주문 상태 변경
         order.cancel();
-
-        // 주문 아이템별로 재고 복구 요청
         order.getOrderItems().forEach(item -> {
-            productClient.increaseStock(
+            OrderCancelledEvent event = new OrderCancelledEvent(
+                    order.getId(),
                     item.getProductId(),
-                    new IncreaseStockRequest(item.getQuantity())
+                    item.getQuantity()
             );
+
+            orderEventPublisher.publishOrderCancelledEvent(event);
         });
     }
 

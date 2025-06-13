@@ -38,12 +38,12 @@ public class Order {
     }
 
     public void cancel() {
-    if (this.status == OrderStatus.CANCELLED) {
-        throw new IllegalStateException("이미 취소된 주문입니다.");
-    }
+        if (this.status == OrderStatus.CANCELLED) {
+            throw new IllegalStateException("이미 취소된 주문입니다.");
+        }
 
-    this.status = OrderStatus.CANCELLED;
-}
+        this.status = OrderStatus.CANCELLED;
+    }
 
     public Long getId() {
         return id;
