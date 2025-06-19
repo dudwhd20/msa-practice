@@ -1,15 +1,17 @@
 package com.youngjong.orderservice.application.service;
 
-import com.youngjong.orderservice.api.request.IncreaseStockRequest;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.youngjong.orderservice.api.response.OrderItemResponse;
 import com.youngjong.orderservice.api.response.OrderResponse;
 import com.youngjong.orderservice.application.command.RegisterOrderCommand;
-import com.youngjong.orderservice.application.event.OrderCancelledEvent;
 import com.youngjong.orderservice.application.event.OrderCancelledIntegrationEvent;
 import com.youngjong.orderservice.application.event.OrderCancelledPayload;
 import com.youngjong.orderservice.application.port.out.OrderEventPublisher;
 import com.youngjong.orderservice.domain.model.Order;
 import com.youngjong.orderservice.domain.model.OrderItem;
+import com.youngjong.orderservice.domain.outbox.OrderOutboxEvent;
+import com.youngjong.orderservice.domain.repository.OrderOutboxEventRepository;
 import com.youngjong.orderservice.domain.repository.OrderRepository;
 import com.youngjong.orderservice.infrastructure.DecreaseStockRequest;
 import com.youngjong.orderservice.infrastructure.ProductClient;
@@ -24,12 +26,17 @@ import java.util.UUID;
 public class OrderService {
     private final OrderRepository orderRepository;
     private final ProductClient productClient;
-    private final OrderEventPublisher orderEventPublisher;
 
-    public OrderService(OrderRepository orderRepository, ProductClient productClient, OrderEventPublisher orderEventPublisher) {
+
+    private final ObjectMapper objectMapper;
+    private final OrderOutboxEventRepository outboxRepository;
+
+
+    public OrderService(OrderRepository orderRepository, ProductClient productClient, ObjectMapper objectMapper, OrderOutboxEventRepository outboxRepository) {
         this.orderRepository = orderRepository;
         this.productClient = productClient;
-        this.orderEventPublisher = orderEventPublisher;
+        this.objectMapper = objectMapper;
+        this.outboxRepository = outboxRepository;
     }
 
     @Transactional
@@ -106,22 +113,33 @@ public class OrderService {
 
     @Transactional
     public void cancelOrder(Long orderId) {
-    Order order = orderRepository.findById(orderId)
-            .orElseThrow(() -> new IllegalArgumentException("Order not found"));
-    order.cancel();
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+        order.cancel();
 
-    String traceId = UUID.randomUUID().toString(); // 추적 ID
+        String traceId = UUID.randomUUID().toString();
 
-    order.getOrderItems().forEach(item -> {
-        OrderCancelledPayload payload = new OrderCancelledPayload(
-                order.getId(),
-                item.getProductId(),
-                item.getQuantity()
-        );
+        order.getOrderItems().forEach(item -> {
+            OrderCancelledPayload payload = new OrderCancelledPayload(
+                    order.getId(),
+                    item.getProductId(),
+                    item.getQuantity()
+            );
 
-        OrderCancelledIntegrationEvent event = new OrderCancelledIntegrationEvent(traceId, payload);
-        orderEventPublisher.publishOrderCancelledEvent(event);
-    });
+            OrderCancelledIntegrationEvent event = new OrderCancelledIntegrationEvent(traceId, payload);
+
+            try {
+                String payloadJson = objectMapper.writeValueAsString(payload);
+                outboxRepository.save(new OrderOutboxEvent(
+                        event.getEventType(),
+                        event.getEventVersion(),
+                        event.getTraceId(),
+                        payloadJson
+                ));
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
 }
