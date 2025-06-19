@@ -5,6 +5,8 @@ import com.youngjong.orderservice.api.response.OrderItemResponse;
 import com.youngjong.orderservice.api.response.OrderResponse;
 import com.youngjong.orderservice.application.command.RegisterOrderCommand;
 import com.youngjong.orderservice.application.event.OrderCancelledEvent;
+import com.youngjong.orderservice.application.event.OrderCancelledIntegrationEvent;
+import com.youngjong.orderservice.application.event.OrderCancelledPayload;
 import com.youngjong.orderservice.application.port.out.OrderEventPublisher;
 import com.youngjong.orderservice.domain.model.Order;
 import com.youngjong.orderservice.domain.model.OrderItem;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class OrderService {
@@ -103,18 +106,22 @@ public class OrderService {
 
     @Transactional
     public void cancelOrder(Long orderId) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("주문을 찾을 수 없습니다."));
-        order.cancel();
-        order.getOrderItems().forEach(item -> {
-            OrderCancelledEvent event = new OrderCancelledEvent(
-                    order.getId(),
-                    item.getProductId(),
-                    item.getQuantity()
-            );
+    Order order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+    order.cancel();
 
-            orderEventPublisher.publishOrderCancelledEvent(event);
-        });
+    String traceId = UUID.randomUUID().toString(); // 추적 ID
+
+    order.getOrderItems().forEach(item -> {
+        OrderCancelledPayload payload = new OrderCancelledPayload(
+                order.getId(),
+                item.getProductId(),
+                item.getQuantity()
+        );
+
+        OrderCancelledIntegrationEvent event = new OrderCancelledIntegrationEvent(traceId, payload);
+        orderEventPublisher.publishOrderCancelledEvent(event);
+    });
     }
 
 }
