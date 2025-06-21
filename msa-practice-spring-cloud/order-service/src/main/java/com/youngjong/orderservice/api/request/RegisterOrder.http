@@ -3,6 +3,6 @@ Content-Type: application/json
 
 {
   "userId": 1,
-  "productId": 1,
-  "quantity": 3
+  "productId": 2,
+  "quantity": 1
 }

@@ -1,8 +1,12 @@
 package com.youngjong.orderservice.domain.outbox;
 
+import com.youngjong.orderservice.application.event.OrderCancelledPayload;
+import com.youngjong.orderservice.config.JsonConverter;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 
@@ -20,12 +24,13 @@ public class OrderOutboxEvent {
     private String eventVersion;
     private String traceId;
 
-    @Lob
-    private String payload;  // JSON 문자열
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "payload")
+    private OrderCancelledPayload payload;
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    public OrderOutboxEvent(String eventType, String eventVersion, String traceId, String payload) {
+    public OrderOutboxEvent(String eventType, String eventVersion, String traceId, OrderCancelledPayload payload) {
         this.eventType = eventType;
         this.eventVersion = eventVersion;
         this.traceId = traceId;

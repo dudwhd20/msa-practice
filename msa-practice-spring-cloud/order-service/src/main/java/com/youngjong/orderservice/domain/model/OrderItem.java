@@ -3,7 +3,7 @@ package com.youngjong.orderservice.domain.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "order_items")
+@Table(name = "order_item")
 public class OrderItem {
 
     @Id

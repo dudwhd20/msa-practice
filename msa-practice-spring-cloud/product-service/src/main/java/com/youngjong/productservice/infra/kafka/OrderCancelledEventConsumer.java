@@ -1,6 +1,7 @@
 package com.youngjong.productservice.infra.kafka;
 
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.youngjong.productservice.application.event.IntegrationEvent;
 import com.youngjong.productservice.application.event.OrderCancelledEvent;
@@ -20,31 +21,29 @@ public class OrderCancelledEventConsumer {
     private final ProductService productService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @KafkaListener(topics = "order-cancelled", groupId = "product-service-group")
+    @KafkaListener(topics = "orderdb-cdc.public.order_outbox_event", groupId = "product-service-group")
     public void consume(String message) {
         try {
-            IntegrationEvent<OrderCancelledPayload> event = objectMapper.readValue(
-                    message,
-                    objectMapper.getTypeFactory().constructParametricType(
-                            IntegrationEvent.class, OrderCancelledPayload.class
-                    )
-            );
+            // Debezium이 발행하는 기본 구조 안에는 before/after 상태가 들어있다
+            log.info("Input Message : {}" , message);
+            JsonNode jsonNode = objectMapper.readTree(message);
+            JsonNode after = jsonNode.get("payload").get("after");
 
-            log.info("Consumed eventType={}, version={}, traceId={}, payload={}",
-                    event.getEventType(),
-                    event.getEventVersion(),
-                    event.getTraceId(),
-                    event.getPayload()
-            );
+            if (after != null) {
+                String eventType = after.get("event_type").asText();
+                String payloadJson = after.get("payload").asText();
 
-            // 재고 복구 처리
-            productService.increaseStock(
-                    event.getPayload().getProductId(),
-                    event.getPayload().getQuantity()
-            );
+                if ("OrderCancelled".equals(eventType)) {
+                    OrderCancelledPayload payload = objectMapper.readValue(payloadJson, OrderCancelledPayload.class);
 
+                    log.info("Recovered stock for productId={}, quantity={}",
+                            payload.getProductId(), payload.getQuantity());
+
+                    productService.increaseStock(payload.getProductId(), payload.getQuantity());
+                }
+            }
         } catch (Exception e) {
-            log.error("Failed to process OrderCancelledIntegrationEvent", e);
+            log.error("Failed to process CDC message", e);
         }
     }
 }

@@ -128,17 +128,17 @@ public class OrderService {
 
             OrderCancelledIntegrationEvent event = new OrderCancelledIntegrationEvent(traceId, payload);
 
-            try {
-                String payloadJson = objectMapper.writeValueAsString(payload);
+//            try {
+//                String payloadJson = objectMapper.writeValueAsString(payload);
                 outboxRepository.save(new OrderOutboxEvent(
                         event.getEventType(),
                         event.getEventVersion(),
                         event.getTraceId(),
-                        payloadJson
+                        payload
                 ));
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
+//            } catch (JsonProcessingException e) {
+//                throw new RuntimeException(e);
+//            }
         });
     }
 

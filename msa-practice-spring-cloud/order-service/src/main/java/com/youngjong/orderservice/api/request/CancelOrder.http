@@ -1,0 +1,3 @@
+@id = 5
+
+POST localhost:8081/orders/{{id}}/cancel
