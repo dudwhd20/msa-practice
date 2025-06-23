@@ -1,7 +1,6 @@
 package com.youngjong.orderservice.domain.outbox;
 
 import com.youngjong.orderservice.application.event.OrderCancelledPayload;
-import com.youngjong.orderservice.config.JsonConverter;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
