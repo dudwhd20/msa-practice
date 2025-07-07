@@ -1,6 +1,6 @@
 # 테스트용 http 내용
 
-POST localhost:8082/products
+POST localhost:8000/products
 Content-Type: application/json
 
 {

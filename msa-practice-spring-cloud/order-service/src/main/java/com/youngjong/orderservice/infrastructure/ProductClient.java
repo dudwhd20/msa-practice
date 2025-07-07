@@ -1,13 +1,14 @@
 package com.youngjong.orderservice.infrastructure;
 
 import com.youngjong.orderservice.api.request.IncreaseStockRequest;
+import com.youngjong.orderservice.config.FeignOkHttpConfig;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name = "product-service", url = "${product.service.url}")
+@FeignClient(name = "product-service", configuration = FeignOkHttpConfig.class)
 public interface ProductClient {
 
     @GetMapping("/products/{id}")

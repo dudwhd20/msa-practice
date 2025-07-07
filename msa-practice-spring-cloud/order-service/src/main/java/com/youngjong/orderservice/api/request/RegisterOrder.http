@@ -1,8 +1,8 @@
-POST localhost:8081/orders
+POST localhost:8000/orders
 Content-Type: application/json
 
 {
   "userId": 1,
-  "productId": 2,
+  "productId": 1,
   "quantity": 1
 }

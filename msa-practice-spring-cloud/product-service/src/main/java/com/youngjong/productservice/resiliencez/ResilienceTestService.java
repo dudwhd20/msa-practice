@@ -12,7 +12,7 @@ public class ResilienceTestService {
 
     @Retry(name = "retry4j", fallbackMethod = "onRetryFail")
     @CircuitBreaker(name = "cb4j", fallbackMethod = "onCircuitBreak")
-    @Bulkhead(name = "bulkhead4j", fallbackMethod = "onBulkheadCrash")
+//    @Bulkhead(name = "bulkhead4j", fallbackMethod = "onBulkheadCrash")
     public String explodeWithStyle(String caller) {
         log.info("💣 Boom! Call from [{}] triggered unstable service", caller);
         throw new RuntimeException("Simulated explosion for test 🎆");

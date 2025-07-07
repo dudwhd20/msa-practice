@@ -9,18 +9,26 @@ spring:
     gateway:
       routes:
         - id: order-service
-          uri: http://localhost:8081  # Eureka lb://order-service
+          uri: lb://order-service  # Eureka lb://order-service
           predicates:
             - Path=/orders/**
+#          filters:
+#            - RewritePath=/orders/(?<path>.*), /$\{path}
         - id: product-service
-          uri: http://localhost:8082
+          uri: lb://product-service
           predicates:
             - Path=/products/**
-
+#          filters:
+#            - RewritePath=/products/(?<path>.*), /$\{path}
     discovery:
       enabled: true
+
+logging :
+  pattern :
+    level : "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
 
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka
+

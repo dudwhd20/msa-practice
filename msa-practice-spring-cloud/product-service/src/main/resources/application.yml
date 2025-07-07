@@ -1,5 +1,5 @@
 server:
-  port: 8082
+  port: 0
 
 spring:
   kafka:
@@ -22,11 +22,21 @@ spring:
         format_sql: true
   application:
     name: product-service
+  cloud :
+    discovery :
+      enabled : true
+    loadbalancer:
+      enabled : true
 
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka
+    register-with-eureka : true
+    fetch-registry : true
+  instance :
+    prefer-ip-address : true
+    instance-id : ${spring.application.name}:${spring.cloud.client.ip-address}:${server.port}
 
 resilience4j:
   retry:
@@ -49,3 +59,6 @@ resilience4j:
 
 
 
+logging :
+  pattern :
+    level : "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
