@@ -1,6 +1,5 @@
 package com.youngjong.productservice.resiliencez;
 
-import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
@@ -20,8 +19,7 @@ public class ResilienceTestService {
 
     @Retry(name = "retry4j", fallbackMethod = "onRetryFail")
     public String retryOnlyTest(String caller) {
-        log.info("🔥 [RetryTest] Attempted call by [{}]", caller);
-        throw new RuntimeException("Retry test failure");
+        log.info("🔥 [RetryTest] Attempted call by [{}]", caller); throw new RuntimeException("Retry test failure");
     }
 
     public String onRetryFail(String caller, Throwable e) {
