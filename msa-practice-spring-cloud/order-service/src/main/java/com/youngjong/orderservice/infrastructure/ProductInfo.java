@@ -1,6 +1,11 @@
 package com.youngjong.orderservice.infrastructure;
 
 public class ProductInfo {
+    public ProductInfo(String name, int price) {
+        this.name = name;
+        this.price = price;
+    }
+
     private String name;
     private int price;
 
