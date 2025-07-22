@@ -1,0 +1,5 @@
+# 테스트용 http 내용
+
+GET localhost:8000/products
+Content-Type: application/json
+

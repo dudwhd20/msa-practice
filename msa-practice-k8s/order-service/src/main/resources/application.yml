@@ -1,0 +1,59 @@
+server:
+  port: 0
+
+spring:
+  cloud:
+    discovery:
+      enabled : true
+    loadbalancer :
+      enabled : true
+    openfeign :
+      okhttp :
+        enabled : true
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+  datasource:
+#    url: jdbc:h2:mem:testdb
+#    driver-class-name: org.h2.Driver
+#    username: sa
+#    password:
+      url: jdbc:postgresql://localhost:5432/orderdb?schema=public
+      username: postgres
+      password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  application:
+    name: order-service
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+    register-with-eureka : true
+    fetch-registry : true
+  instance :
+    prefer-ip-address : true
+    instance-id : ${spring.application.name}:${spring.cloud.client.ip-address}:${server.port}
+
+logging :
+  pattern :
+    level : "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+  level:
+    com.youngjong.orderservice.infrastructure.ProductClient: DEBUG  # Feign 인터페이스 직접
+    feign: DEBUG
+    feign.Logger: DEBUG
+    feign.Request: DEBUG
+    feign.Response: DEBUG
+    org.springframework.cloud.openfeign: DEBUG
+

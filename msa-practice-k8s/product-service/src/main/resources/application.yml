@@ -1,0 +1,64 @@
+server:
+  port: 0
+
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: product-service-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  application:
+    name: product-service
+  cloud :
+    discovery :
+      enabled : true
+    loadbalancer:
+      enabled : true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+    register-with-eureka : true
+    fetch-registry : true
+  instance :
+    prefer-ip-address : true
+    instance-id : ${spring.application.name}:${spring.cloud.client.ip-address}:${server.port}
+
+resilience4j:
+  retry:
+    instances:
+      retry4j:
+        max-attempts: 3
+        wait-duration: 1s
+
+  circuitbreaker:
+    instances:
+      cb4j:
+        failure-rate-threshold: 50
+        minimum-number-of-calls: 5
+        wait-duration-in-open-state: 10s
+
+  bulkhead:
+    instances:
+      bulkhead4j:
+        max-concurrent-calls: 2
+
+
+
+logging :
+  pattern :
+    level : "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
