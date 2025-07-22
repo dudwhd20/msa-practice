@@ -1,13 +1,11 @@
 package com.youngjong.orderservice.application.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.youngjong.orderservice.api.response.OrderItemResponse;
 import com.youngjong.orderservice.api.response.OrderResponse;
 import com.youngjong.orderservice.application.command.RegisterOrderCommand;
 import com.youngjong.orderservice.application.event.OrderCancelledIntegrationEvent;
 import com.youngjong.orderservice.application.event.OrderCancelledPayload;
-import com.youngjong.orderservice.application.port.out.OrderEventPublisher;
 import com.youngjong.orderservice.domain.model.Order;
 import com.youngjong.orderservice.domain.model.OrderItem;
 import com.youngjong.orderservice.domain.outbox.OrderOutboxEvent;
