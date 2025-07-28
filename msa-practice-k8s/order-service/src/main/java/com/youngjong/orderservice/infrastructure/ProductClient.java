@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name = "product-service", configuration = FeignOkHttpConfig.class)
+@FeignClient(name = "product-service", configuration = FeignOkHttpConfig.class, url = "${product.service.url}")
 public interface ProductClient {
 
     @GetMapping("/products/{id}")
