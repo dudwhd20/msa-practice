@@ -36,8 +36,9 @@ logging :
     level : "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
 
 
-product-service:
-  url: http://localhost:8081
+product:
+  service:
+    url: http://localhost:8081
 
 ---
 spring:
@@ -49,3 +50,7 @@ spring:
     driver-class-name: org.postgresql.Driver
     username: postgres
     password: postgres
+
+product:
+  service:
+    url: product-service:8081
