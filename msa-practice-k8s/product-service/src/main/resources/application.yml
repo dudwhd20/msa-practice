@@ -1,7 +1,9 @@
 server:
-  port: 0
+  port: 8081
 
 spring:
+  profiles:
+    active : local
   kafka:
     bootstrap-servers: localhost:9092
     consumer:
@@ -9,7 +11,7 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
   datasource:
-    url: jdbc:h2:mem:testdb
+    url: jdbc:h2:mem:product-db
     driver-class-name: org.h2.Driver
     username: sa
     password:
@@ -47,3 +49,22 @@ resilience4j:
 logging :
   pattern :
     level : "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include : health
+    enabled-by-default : false
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile : docker
+  datasource:
+    url: jdbc:postgresql://product-postgres:5432/productdb?schema=public
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: postgres

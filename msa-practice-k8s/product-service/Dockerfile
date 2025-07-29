@@ -1,4 +1,4 @@
-FROM openjdk:17
+FROM eclipse-temurin:17-jdk
 LABEL maintainer="youngjongso"
 
 ARG JAR_FILE=build/libs/product-service.jar
